@@ -5,7 +5,7 @@ from etl.transform import extract_company_info
 from etl.transform import prepare_job_data
 from etl.load import load_company_and_jos
 from etl.load import load_errors
-from etl.validate import validate_job_data
+from etl.validata import validate_job_data
 
 
 if __name__ == "__main__":
