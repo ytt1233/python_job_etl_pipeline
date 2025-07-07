@@ -8,5 +8,11 @@ DB_CONFIG = {
 }
 
 DATA_PATH = {
-    "ai_job_csv": "data/ai_jobs.csv"
+    "ai_jobs_csv": "data/ai_jobs.csv"
+}
+
+DATA_PATH_CLEAN = {
+    "ai_jobs_clean_csv": "results/ai_jobs_clean.csv",
+    "company": "results/company.csv",
+    "error_jobs": "results/error_jobs.csv",
 }

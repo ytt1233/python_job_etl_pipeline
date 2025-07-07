@@ -4,40 +4,25 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import re
-from transform import clean_data, extract_company_info, job_data_clean, prepare_job_data
+import sys
+import os
+from pathlib import Path
+
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))#添加根目录到sys.path中
+from etl.transform import parse_salary_range
 
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 正确显示中文
 plt.rcParams['axes.unicode_minus'] = False    # 正确显示负号
 
 # === 第一步：读取数据 ===
-df = pd.read_csv("data/ai_jobs.csv", encoding="gbk")
+df = pd.read_csv("f:/mycode/job_etl_pipeline/data/ai_jobs.csv", encoding="gbk")
 
 print("数据加载完成，总行数:", len(df))
 # print(df[["岗位", "城市", "薪酬"]].head())
 
 # === 第二步：清洗薪酬，构建 salary_avg ===
-# def clean_salary(salary_str):
-#     if not isinstance(salary_str, str):
-#         return None
-#     salary_str = salary_str.lower().strip()
-#     if any(term in salary_str for term in ["面议", "暂无", "--"]):
-#         return None
-#     match = re.match(r'(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*(万|k)?', salary_str)
-#     if match:
-#         low = float(match.group(1))
-#         high = float(match.group(2))
-#         unit = match.group(3)
-#         avg = (low + high) / 2
-#         if unit == "万":
-#             return int(avg * 10000)
-#         elif unit == "k":
-#             return int(avg * 1000)
-#         else:
-#             return int(avg)
-#     return None
-
-# df["salary_avg"] = df["薪酬"].apply(clean_salary) 
-df["salary_avg"] = df["薪酬"].apply(job_data_clean)
+df["salary_avg"] = df["薪酬"].apply(parse_salary_range)
 df.to_csv("salary_clean.csv", index=False,encoding="utf-8")
 print(df[["岗位", "城市", "薪酬", "salary_avg"]].head())
 
