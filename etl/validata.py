@@ -22,7 +22,7 @@ def validate_job_data(job_df):
             issues.append("薪酬为负数")
             dels.append('是')  # 明显错误，剔除
         if row['salary_outlier_flag'] == 1:
-            issues.append("薪酬太高")
+            issues.append("薪酬异常")
             dels.append('否')#仅标记错误，但不删除原数据
         # 工作经验平均值是否为负
         if row.get('experience_years') is not None and row['experience_years'] < 0:

@@ -44,7 +44,7 @@ def prepare_job_data(df):
     })
     # 处理薪酬数据,生成新的列salary_avg并清洗
     job_df["salary_avg"] = job_df["salary_raw"].apply(parse_salary_range)
-    job_df = mark_salary_outliers(job_df)
+    job_df = mark_salary_outliers_iqr(job_df)
     # 处理学历数据
     job_df["education_clean"] = job_df["education_raw"].apply(standardize_education)
     # 处理经验数据
@@ -84,12 +84,32 @@ def parse_salary_range(salary_str):
 
     return None
 
-def mark_salary_outliers(df, threshold=50000):
+def mark_salary_outliers_iqr(df, factor=1.5):
     """
-    标记 salary_avg 超过指定阈值的为异常
+    使用 IQR 算法标记薪酬异常值：
+    - 低于 Q1 - factor × IQR
+    - 高于 Q3 + factor × IQR
+    将在 salary_outlier_flag 中标记 1（异常）或 0（正常）
+
+    参数：
+        df：包含 salary_avg 的 DataFrame
+        factor：控制异常判断范围，默认 1.5
+
+    返回：
+        添加 salary_outlier_flag 列的 DataFrame
     """
-    df["salary_outlier_flag"] = df["salary_avg"] > threshold
+    q1 = df["salary_avg"].quantile(0.25)
+    q3 = df["salary_avg"].quantile(0.75)
+    iqr = q3 - q1
+    lower_limit = q1 - factor * iqr
+    upper_limit = q3 + factor * iqr
+
+    # 标记为 1 是异常值，0 是正常值
+    df["salary_outlier_flag"] = df["salary_avg"].apply(
+        lambda x: 1 if (pd.notnull(x) and (x < lower_limit or x > upper_limit)) else 0
+    )
     return df
+
 
 def standardize_education(edu_str):
     """
